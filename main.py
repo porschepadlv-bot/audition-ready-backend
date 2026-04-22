@@ -1,3 +1,4 @@
+cat > main.py <<'EOF'
 from fastapi import FastAPI
 from pydantic import BaseModel
 from openai import OpenAI
@@ -40,3 +41,4 @@ def search(req: SearchRequest):
  parsed = []
 
  return parsed
+EOF
