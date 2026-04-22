@@ -1,4 +1,3 @@
-cat > main.py <<'EOF'
 from fastapi import FastAPI
 from pydantic import BaseModel
 from openai import OpenAI
@@ -35,10 +34,9 @@ def search(req: SearchRequest):
  raw = completion.choices[0].message.content.strip()
 
  try:
-     parsed = json.loads(raw)
+ parsed = json.loads(raw)
  except Exception as e:
-     print("JSON PARSE ERROR:", e)
-     parsed = []
+ print("JSON PARSE ERROR:", e)
+ parsed = []
 
  return parsed
-EOF
