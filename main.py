@@ -16,6 +16,7 @@ def root():
 
 @app.post("/search")
 def search(req: SearchRequest):
+ try:
  completion = client.chat.completions.create(
  model="gpt-4o-mini",
  messages=[
@@ -32,3 +33,6 @@ def search(req: SearchRequest):
 
  content = completion.choices[0].message.content
  return {"raw": content}
+
+ except Exception as e:
+ return {"error": str(e)}
