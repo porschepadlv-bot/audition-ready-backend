@@ -11,6 +11,10 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 class SearchRequest(BaseModel):
  prompt: str
 
+@app.get("/")
+def root():
+ return {"status": "API is running"}
+
 @app.post("/search")
 def search(req: SearchRequest):
  completion = client.chat.completions.create(
