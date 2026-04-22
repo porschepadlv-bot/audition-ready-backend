@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from openai import OpenAI
+import os
 
 app = FastAPI()
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 class SearchRequest(BaseModel):
  prompt: str
@@ -12,17 +16,21 @@ def root():
 
 @app.post("/search")
 def search(req: SearchRequest):
- return {
- "result": [
+ try:
+ completion = client.chat.completions.create(
+ model="gpt-4o-mini",
+ messages=[
  {
- "title": "Sample Acting Job 1",
- "summary": f"Search received: {req.prompt}",
- "location": "Las Vegas, NV"
+ "role": "system",
+ "content": "Return audition results as a JSON array. Each item must include: title, summary, location."
  },
  {
- "title": "Sample Acting Job 2",
- "summary": "Backend is working correctly.",
- "location": "Henderson, NV"
+ "role": "user",
+ "content": req.prompt
  }
  ]
- }
+ )
+ content = completion.choices[0].message.content
+ return {"result": content}
+ except Exception as e:
+ return {"error": str(e)}
