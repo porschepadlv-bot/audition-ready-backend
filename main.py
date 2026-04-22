@@ -1,12 +1,8 @@
-from dotenv import load_dotenv
-import os
-import json
-
 from fastapi import FastAPI
 from pydantic import BaseModel
 from openai import OpenAI
-
-load_dotenv()
+import os
+import json
 
 app = FastAPI()
 
@@ -15,14 +11,18 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 class SearchRequest(BaseModel):
  prompt: str
 
+@app.get("/")
+def root():
+ return {"status": "API is running"}
+
 @app.post("/search")
 def search(req: SearchRequest):
  completion = client.chat.completions.create(
- model=os.getenv("OPENAI_MODEL"),
+ model="gpt-4o-mini",
  messages=[
  {
  "role": "system",
- "content": "Return audition results as a JSON array. Each item must include: title, summary, location, type, pay."
+ "content": "Return audition results as a JSON array. Each item must include: title, summary, location."
  },
  {
  "role": "user",
@@ -34,7 +34,6 @@ def search(req: SearchRequest):
  content = completion.choices[0].message.content
 
  try:
-     parsed = json.loads(content)
-     return parsed
- except:
-     return {"raw": content}
+ return json.loads(content)
+ except Exception:
+ return {"raw": content}
