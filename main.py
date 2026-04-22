@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from openai import OpenAI
 import os
-import json
 
 app = FastAPI()
 
@@ -32,8 +31,4 @@ def search(req: SearchRequest):
  )
 
  content = completion.choices[0].message.content
-
- try:
- return json.loads(content)
- except Exception:
  return {"raw": content}
