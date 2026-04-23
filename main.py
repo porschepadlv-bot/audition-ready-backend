@@ -6,9 +6,9 @@ app = FastAPI()
 
 @app.get("/")
 def root():
-return {"status": "API is running"}
+    return {"status": "API is running"}
 
 @app.post("/search", response_model=SearchResponse)
 def search(req: SearchRequest):
-results = aggregate_results(req.prompt)
-return {"results": results}
+    results = aggregate_results(req.prompt)
+    return {"results": results}
