@@ -1,17 +1,14 @@
 from typing import List
-from urllib.parse import quote_plus
 from models import Listing
 
 
-def search_craigslist(query: str) -> List[Listing]:
-    encoded = quote_plus(query)
-
+def search_indeed(query: str) -> List[Listing]:
     return [
         Listing(
-            title=f"Craigslist quick gigs: {query}",
+            title=f"Indeed jobs: {query}",
             location="Las Vegas",
-            source="Craigslist",
-            summary="Quick local gigs and casting posts. Tap to view matching Craigslist results.",
-            url=f"https://lasvegas.craigslist.org/search/ggg?query={encoded}"
+            source="Indeed",
+            summary="Tap to view matching Indeed job results.",
+            url="https://www.indeed.com/jobs?q=" + query.replace(" ", "+")
         )
     ]
