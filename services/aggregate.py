@@ -10,10 +10,10 @@ def aggregate_results(query: str) -> List[Listing]:
         results.extend(search_backstage(query))
     except Exception as e:
         print("Backstage error:", e)
-try:
-    results.extend(search_indeed(query))
-except Exception as e:
-    print("Indeed error:", e)
 
+    try:
+        results.extend(search_indeed(query))
+    except Exception as e:
+        print("Indeed error:", e)
 
     return results[:10]
