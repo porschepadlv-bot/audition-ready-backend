@@ -9,7 +9,9 @@ def aggregate_results(query: str) -> List[Listing]:
     results: List[Listing] = []
 
     try:
-        results.extend(search_backstage(query))
+        cl = search_craigslist(query)
+print("CRAIGSLIST RESULTS:", cl)
+results.extend(cl)
     except Exception as e:
         print("Backstage error:", e)
 
