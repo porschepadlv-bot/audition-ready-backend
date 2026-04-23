@@ -34,7 +34,7 @@ def search(req: SearchRequest):
  raw = completion.choices[0].message.content
 
  try:
- parsed = json.loads(raw)
- return parsed
+     parsed = json.loads(raw)
+     return parsed
  except Exception:
- return {"error": "Invalid JSON from AI", "raw": raw}
+     return {"error": "Invalid JSON from AI", "raw": raw}
