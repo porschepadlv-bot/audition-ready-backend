@@ -2,10 +2,10 @@ from typing import List
 from models import Listing
 from sources.craigslist import search_craigslist
 
-
 def aggregate_results(query: str) -> List[Listing]:
 results: List[Listing] = []
 
+# TEMP: force at least one result (so we know UI works)
 results.append(
 Listing(
 title=f"Test listing for: {query}",
