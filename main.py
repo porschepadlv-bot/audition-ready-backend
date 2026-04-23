@@ -38,3 +38,4 @@ def search(req: SearchRequest):
  return parsed
  except Exception:
  return {"error": "Invalid JSON from AI", "raw": raw}
+
