@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from openai import OpenAI
 import os
-import json
 
 app = FastAPI()
 
@@ -20,21 +19,13 @@ def search(req: SearchRequest):
  completion = client.chat.completions.create(
  model="gpt-4o-mini",
  messages=[
- {
- "role": "system",
- "content": "Return audition results as a pure JSON array. No backticks. No explanation."
- },
- {
- "role": "user",
- "content": req.prompt
- }
+ {"role": "system", "content": "Return acting auditions in a simple list."},
+ {"role": "user", "content": req.prompt}
  ]
  )
 
  raw = completion.choices[0].message.content
 
- try:
-     parsed = json.loads(raw)
-     return parsed
- except Exception:
-     return {"error": "Invalid JSON from AI", "raw": raw}
+ return {
+ "results": [raw]
+ }
