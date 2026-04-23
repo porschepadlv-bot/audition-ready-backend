@@ -11,4 +11,4 @@ def root():
 @app.post("/search", response_model=SearchResponse)
 def search(req: SearchRequest):
     results = aggregate_results(req.prompt)
-    return {"results": results}  
+    return {"results": results}   
