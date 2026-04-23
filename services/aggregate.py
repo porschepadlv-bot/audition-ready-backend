@@ -2,12 +2,23 @@ from typing import List
 from models import Listing
 from sources.craigslist import search_craigslist
 
+
 def aggregate_results(query: str) -> List[Listing]:
-    results = []
+results: List[Listing] = []
 
-    try:
-        results.extend(search_craigslist(query))
-    except Exception:
-        pass
+results.append(
+Listing(
+title=f"Test listing for: {query}",
+location="Las Vegas",
+source="Test",
+summary="Temporary test result",
+url="https://example.com"
+)
+)
 
-    return results[:10]
+try:
+results.extend(search_craigslist(query))
+except Exception as e:
+print("Craigslist error:", e)
+
+return results[:10]
