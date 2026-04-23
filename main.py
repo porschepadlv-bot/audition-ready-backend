@@ -31,12 +31,10 @@ def search(req: SearchRequest):
  ]
  )
 
- raw = completion.choices[0].message.content.strip()
+ raw = completion.choices[0].message.content
 
  try:
  parsed = json.loads(raw)
- except Exception as e:
- print("JSON PARSE ERROR:", e)
- parsed = []
-
  return parsed
+ except Exception:
+ return {"error": "Invalid JSON from AI", "raw": raw}
