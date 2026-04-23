@@ -45,7 +45,7 @@ def search(req: SearchRequest):
  ]
 
  try:
- completion = client.chat.completions.create(
+     completion = client.chat.completions.create(
  model="gpt-4o-mini",
  messages=[
  {
