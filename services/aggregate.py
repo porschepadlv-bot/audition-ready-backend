@@ -6,7 +6,7 @@ from models import Listing
 
 
 def aggregate_results(query: str) -> List[Listing]:
-    results: List[Listing] = []
+    results: List[tuple] = []  # (priority, Listing)
     seen_urls = set()
 
     def add_results(new_results: List[Listing], priority: int):
@@ -18,13 +18,10 @@ def aggregate_results(query: str) -> List[Listing]:
                 continue
 
             seen_urls.add(item.url)
-
-            # Attach priority score
-            item.priority = priority
-            results.append(item)
+            results.append((priority, item))
 
     try:
-        add_results(search_backstage(query), priority=1)  # BEST
+        add_results(search_backstage(query), priority=1)
     except Exception as e:
         print("Backstage error:", e)
 
@@ -38,7 +35,10 @@ def aggregate_results(query: str) -> List[Listing]:
     except Exception as e:
         print("Craigslist error:", e)
 
-    # Sort by priority (lower = better)
-    results.sort(key=lambda x: getattr(x, "priority", 99))
+    # Sort by priority
+    results.sort(key=lambda x: x[0])
 
-    return results[:10]
+    # Extract only Listing objects
+    final_results = [item for _, item in results]
+
+    return final_results[:10]
