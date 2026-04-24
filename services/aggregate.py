@@ -11,23 +11,25 @@ def aggregate_results(query: str) -> List[Listing]:
 
     def add_results(new_results: List[Listing]):
         for item in new_results:
-            if item.url not in seen_urls:
-                seen_urls.add(item.url)
-                results.append(item)
+            if not item.url:
+                continue
 
-    # Backstage
+            if item.url in seen_urls:
+                continue
+
+            seen_urls.add(item.url)
+            results.append(item)
+
     try:
         add_results(search_backstage(query))
     except Exception as e:
         print("Backstage error:", e)
 
-    # Indeed
     try:
         add_results(search_indeed(query))
     except Exception as e:
         print("Indeed error:", e)
 
-    # Craigslist (RESTORED)
     try:
         add_results(search_craigslist(query))
     except Exception as e:
