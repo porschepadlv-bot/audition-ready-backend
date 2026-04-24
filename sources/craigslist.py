@@ -1,78 +1,20 @@
-from typing import List
-from urllib.parse import quote_plus
-from models import Listing
-import requests
-from bs4 import BeautifulSoup
-
-
-def scrape_category(category: str, query: str) -> List[Listing]:
-    encoded = quote_plus(query)
-    url = f"https://lasvegas.craigslist.org/search/{category}?query={encoded}"
-
-    results = []
-
-    try:
-        response = requests.get(
-            url,
-            headers={"User-Agent": "Mozilla/5.0"},
-            timeout=10
-        )
-
-        soup = BeautifulSoup(response.text, "html.parser")
-
-        # 🔥 support multiple layouts
-        rows = soup.select(".result-row") or soup.select("li.cl-static-search-result")
-
-        for r in rows:
-            title_tag = (
-                r.select_one(".result-title")
-                or r.select_one("a.posting-title")
-                or r.select_one("a")
-            )
-
-            if not title_tag:
-                continue
-
-            title = title_tag.get_text(strip=True)
-            link = title_tag.get("href", "")
-
-            if not title or len(title) < 10:
-                continue
-
-            if link.startswith("/"):
-                link = "https://lasvegas.craigslist.org" + link
-
-            if "craigslist.org" not in link:
-                continue
-
-            results.append(
-                Listing(
-                    title=title,
-                    location="Las Vegas",
-                    source="Craigslist",
-                    summary="Casting / gig opportunity. Tap to view details.",
-                    url=link
-                )
-            )
-
-            if len(results) >= 3:
-                break
-
-    except Exception as e:
-        print(f"Craigslist {category} error:", e)
-
-    return results
-
-
 def search_craigslist(query: str) -> List[Listing]:
     listings: List[Listing] = []
 
-    # search multiple categories
     listings.extend(scrape_category("ggg", query))
     listings.extend(scrape_category("tlg", query))
 
-    if listings:
-        return listings[:5]
+    # 🔥 remove duplicates by URL
+    seen = set()
+    unique = []
+
+    for item in listings:
+        if item.url not in seen:
+            seen.add(item.url)
+            unique.append(item)
+
+    if unique:
+        return unique[:5]
 
     encoded = quote_plus(query)
     return [
