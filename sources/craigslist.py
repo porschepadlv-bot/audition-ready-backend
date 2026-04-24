@@ -5,11 +5,11 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def search_craigslist(query: str) -> List[Listing]:
+def scrape_category(category: str, query: str) -> List[Listing]:
     encoded = quote_plus(query)
-    url = f"https://lasvegas.craigslist.org/search/ggg?query={encoded}"
+    url = f"https://lasvegas.craigslist.org/search/{category}?query={encoded}"
 
-    listings: List[Listing] = []
+    results = []
 
     try:
         response = requests.get(
@@ -20,13 +20,8 @@ def search_craigslist(query: str) -> List[Listing]:
 
         soup = BeautifulSoup(response.text, "html.parser")
 
-        # Try modern Craigslist result cards first
-        for r in soup.select(".result-row, li.cl-static-search-result, div.gallery-card"):
-            title_tag = (
-                r.select_one(".result-title")
-                or r.select_one("a.posting-title")
-                or r.select_one("a")
-            )
+        for r in soup.select(".result-row"):
+            title_tag = r.select_one(".result-title")
 
             if not title_tag:
                 continue
@@ -34,19 +29,10 @@ def search_craigslist(query: str) -> List[Listing]:
             title = title_tag.get_text(strip=True)
             link = title_tag.get("href", "")
 
-            if not title or title.lower() == "craigslist":
+            if not title or len(title) < 10:
                 continue
 
-            if len(title) < 10:
-                continue
-
-            if link.startswith("/"):
-                link = "https://lasvegas.craigslist.org" + link
-
-            if "craigslist.org" not in link:
-                continue
-
-            listings.append(
+            results.append(
                 Listing(
                     title=title,
                     location="Las Vegas",
@@ -56,21 +42,32 @@ def search_craigslist(query: str) -> List[Listing]:
                 )
             )
 
-            if len(listings) >= 5:
+            if len(results) >= 3:
                 break
 
     except Exception as e:
-        print("Craigslist scrape error:", e)
+        print(f"Craigslist {category} error:", e)
+
+    return results
+
+
+def search_craigslist(query: str) -> List[Listing]:
+    listings: List[Listing] = []
+
+    # 🔥 search multiple categories
+    listings.extend(scrape_category("ggg", query))  # gigs
+    listings.extend(scrape_category("tlg", query))  # talent
 
     if listings:
-        return listings
+        return listings[:5]
 
+    encoded = quote_plus(query)
     return [
         Listing(
-            title=f"Craigslist gigs: {query}",
+            title=f"Craigslist results: {query}",
             location="Las Vegas",
             source="Craigslist",
-            summary="Quick local gigs and casting posts. Tap to view results.",
-            url=url
+            summary="Tap to view Craigslist search results.",
+            url=f"https://lasvegas.craigslist.org/search/ggg?query={encoded}"
         )
     ]
