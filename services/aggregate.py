@@ -21,7 +21,7 @@ def aggregate_results(query: str) -> List[Listing]:
             seen_urls.add(item.url)
             results.append((priority, item))
 
-    # Existing sources
+    # Core sources
     try:
         add_results(search_backstage(query), priority=1)
     except Exception as e:
@@ -37,7 +37,7 @@ def aggregate_results(query: str) -> List[Listing]:
     except Exception as e:
         print("Craigslist error:", e)
 
-    # 🔥 NEW SOURCES (STABLE LINKS)
+    # Extra stable sources
     encoded = quote_plus(query)
 
     extra_sources = [
@@ -69,6 +69,26 @@ def aggregate_results(query: str) -> List[Listing]:
                 source="Facebook",
                 summary="Find local casting calls in Facebook groups.",
                 url=f"https://www.facebook.com/search/groups/?q={encoded}"
+            )
+        ),
+        (
+            7,
+            Listing(
+                title=f"Actors Access: {query}",
+                location="Nationwide",
+                source="Actors Access",
+                summary="Professional breakdowns and casting notices.",
+                url="https://actorsaccess.com/"
+            )
+        ),
+        (
+            8,
+            Listing(
+                title=f"Casting Frontier: {query}",
+                location="Nationwide",
+                source="Casting Frontier",
+                summary="Auditions and casting calls for actors and models.",
+                url=f"https://castingfrontier.com/search?query={encoded}"
             )
         )
     ]
