@@ -24,43 +24,49 @@ def search_craigslist(query: str) -> List[Listing]:
             title = a.get_text(strip=True)
             link = a.get("href", "")
 
-            if not title:
+            # 🚫 skip junk titles
+            if not title or title.lower() in ["craigslist"]:
                 continue
 
+            # 🚫 skip very short / useless titles
+            if len(title) < 10:
+                continue
+
+            # 🚫 skip bad links
             if "craigslist.org" not in link and not link.startswith("/"):
                 continue
 
+            # fix relative links
             if link.startswith("/"):
                 link = "https://lasvegas.craigslist.org" + link
-
-            if len(title) < 8:
-                continue
 
             listings.append(
                 Listing(
                     title=title,
                     location="Las Vegas",
                     source="Craigslist",
-                    summary="Local gig or casting opportunity from Craigslist.",
+                    summary="Casting / gig opportunity. Tap to view details.",
                     url=link
                 )
             )
 
+            # limit results
             if len(listings) >= 5:
                 break
 
     except Exception as e:
         print("Craigslist scrape error:", e)
 
+    # fallback if nothing found
     if listings:
         return listings
 
     return [
         Listing(
-            title=f"Craigslist quick gigs: {query}",
+            title=f"Craigslist gigs: {query}",
             location="Las Vegas",
             source="Craigslist",
-            summary="Quick local gigs and casting posts. Tap to view matching Craigslist results.",
+            summary="Quick local gigs and casting posts. Tap to view results.",
             url=url
         )
     ]
