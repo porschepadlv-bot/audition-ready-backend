@@ -7,7 +7,7 @@ from urllib.parse import quote_plus
 
 
 def aggregate_results(query: str) -> List[Listing]:
-    results: List[tuple] = []  # (priority, Listing)
+    results: List[tuple] = []
     seen_urls = set()
 
     def add_results(new_results: List[Listing], priority: int):
@@ -37,60 +37,58 @@ def aggregate_results(query: str) -> List[Listing]:
     except Exception as e:
         print("Craigslist error:", e)
 
-    # Extra stable sources
     encoded = quote_plus(query)
 
     extra_sources = [
-        (
-            4,
-            Listing(
-                title=f"Casting Networks: {query}",
-                location="Nationwide",
-                source="Casting Networks",
-                summary="Browse professional casting calls.",
-                url=f"https://www.castingnetworks.com/search/?q={encoded}"
-            )
-        ),
-        (
-            5,
-            Listing(
-                title=f"Mandy Casting: {query}",
-                location="Nationwide",
-                source="Mandy",
-                summary="Film, TV, and commercial casting calls.",
-                url=f"https://www.mandy.com/jobs?search={encoded}"
-            )
-        ),
-        (
-            6,
-            Listing(
-                title=f"Facebook Groups: {query}",
-                location="Local / Online",
-                source="Facebook",
-                summary="Find local casting calls in Facebook groups.",
-                url=f"https://www.facebook.com/search/groups/?q={encoded}"
-            )
-        ),
-        (
-            7,
-            Listing(
-                title=f"Actors Access: {query}",
-                location="Nationwide",
-                source="Actors Access",
-                summary="Professional breakdowns and casting notices.",
-                url="https://actorsaccess.com/"
-            )
-        ),
-        (
-            8,
-            Listing(
-                title=f"Casting Frontier: {query}",
-                location="Nationwide",
-                source="Casting Frontier",
-                summary="Auditions and casting calls for actors and models.",
-                url=f"https://castingfrontier.com/search?query={encoded}"
-            )
-        )
+        (4, Listing(
+            title=f"Casting Networks: {query}",
+            location="Nationwide",
+            source="Casting Networks",
+            summary="Browse professional casting calls.",
+            url=f"https://www.castingnetworks.com/search/?q={encoded}"
+        )),
+        (5, Listing(
+            title=f"Mandy Casting: {query}",
+            location="Nationwide",
+            source="Mandy",
+            summary="Film, TV, and commercial casting calls.",
+            url=f"https://www.mandy.com/jobs?search={encoded}"
+        )),
+        (6, Listing(
+            title=f"Facebook Groups: {query}",
+            location="Local / Online",
+            source="Facebook",
+            summary="Find local casting calls in Facebook groups.",
+            url=f"https://www.facebook.com/search/groups/?q={encoded}"
+        )),
+        (7, Listing(
+            title=f"Actors Access: {query}",
+            location="Nationwide",
+            source="Actors Access",
+            summary="Professional breakdowns and casting notices.",
+            url="https://actorsaccess.com/"
+        )),
+        (8, Listing(
+            title=f"Casting Frontier: {query}",
+            location="Nationwide",
+            source="Casting Frontier",
+            summary="Auditions and casting calls for actors and models.",
+            url=f"https://castingfrontier.com/search?query={encoded}"
+        )),
+        (9, Listing(
+            title=f"Playbill Jobs: {query}",
+            location="Nationwide",
+            source="Playbill",
+            summary="Theater jobs, auditions, and casting calls.",
+            url=f"https://www.playbill.com/jobs"
+        )),
+        (10, Listing(
+            title=f"Entertainment Careers: {query}",
+            location="Nationwide",
+            source="EntertainmentCareers",
+            summary="Entertainment industry jobs and opportunities.",
+            url=f"https://www.entertainmentcareers.net/search/?search={encoded}"
+        ))
     ]
 
     for item in extra_sources:
@@ -98,7 +96,6 @@ def aggregate_results(query: str) -> List[Listing]:
             seen_urls.add(item[1].url)
             results.append(item)
 
-    # Sort by priority
     results.sort(key=lambda x: x[0])
 
     final_results = [item for _, item in results]
