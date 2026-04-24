@@ -1,28 +1,25 @@
+from typing import List
+from urllib.parse import quote_plus
+from models import Listing
+
+
 def search_craigslist(query: str) -> List[Listing]:
-    listings: List[Listing] = []
+    try:
+        encoded = quote_plus(query)
 
-    listings.extend(scrape_category("ggg", query))
-    listings.extend(scrape_category("tlg", query))
+        # ALWAYS return at least one working result
+        results = [
+            Listing(
+                title=f"Craigslist results: {query}",
+                location="Las Vegas",
+                source="Craigslist",
+                summary="Browse local gigs and casting opportunities on Craigslist.",
+                url=f"https://lasvegas.craigslist.org/search/ggg?query={encoded}"
+            )
+        ]
 
-    # 🔥 remove duplicates by URL
-    seen = set()
-    unique = []
+        return results
 
-    for item in listings:
-        if item.url not in seen:
-            seen.add(item.url)
-            unique.append(item)
-
-    if unique:
-        return unique[:5]
-
-    encoded = quote_plus(query)
-    return [
-        Listing(
-            title=f"Craigslist results: {query}",
-            location="Las Vegas",
-            source="Craigslist",
-            summary="Tap to view Craigslist search results.",
-            url=f"https://lasvegas.craigslist.org/search/ggg?query={encoded}"
-        )
-    ]
+    except Exception as e:
+        print("Craigslist failure:", e)
+        return []
