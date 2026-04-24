@@ -20,8 +20,15 @@ def scrape_category(category: str, query: str) -> List[Listing]:
 
         soup = BeautifulSoup(response.text, "html.parser")
 
-        for r in soup.select(".result-row"):
-            title_tag = r.select_one(".result-title")
+        # 🔥 support multiple layouts
+        rows = soup.select(".result-row") or soup.select("li.cl-static-search-result")
+
+        for r in rows:
+            title_tag = (
+                r.select_one(".result-title")
+                or r.select_one("a.posting-title")
+                or r.select_one("a")
+            )
 
             if not title_tag:
                 continue
@@ -30,6 +37,12 @@ def scrape_category(category: str, query: str) -> List[Listing]:
             link = title_tag.get("href", "")
 
             if not title or len(title) < 10:
+                continue
+
+            if link.startswith("/"):
+                link = "https://lasvegas.craigslist.org" + link
+
+            if "craigslist.org" not in link:
                 continue
 
             results.append(
@@ -54,9 +67,9 @@ def scrape_category(category: str, query: str) -> List[Listing]:
 def search_craigslist(query: str) -> List[Listing]:
     listings: List[Listing] = []
 
-    # 🔥 search multiple categories
-    listings.extend(scrape_category("ggg", query))  # gigs
-    listings.extend(scrape_category("tlg", query))  # talent
+    # search multiple categories
+    listings.extend(scrape_category("ggg", query))
+    listings.extend(scrape_category("tlg", query))
 
     if listings:
         return listings[:5]
