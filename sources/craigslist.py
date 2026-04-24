@@ -20,25 +20,31 @@ def search_craigslist(query: str) -> List[Listing]:
 
         soup = BeautifulSoup(response.text, "html.parser")
 
-        for a in soup.select("a")[:50]:
-            title = a.get_text(strip=True)
-            link = a.get("href", "")
+        # Try modern Craigslist result cards first
+        for r in soup.select(".result-row, li.cl-static-search-result, div.gallery-card"):
+            title_tag = (
+                r.select_one(".result-title")
+                or r.select_one("a.posting-title")
+                or r.select_one("a")
+            )
 
-            # 🚫 skip junk titles
-            if not title or title.lower() in ["craigslist"]:
+            if not title_tag:
                 continue
 
-            # 🚫 skip very short / useless titles
+            title = title_tag.get_text(strip=True)
+            link = title_tag.get("href", "")
+
+            if not title or title.lower() == "craigslist":
+                continue
+
             if len(title) < 10:
                 continue
 
-            # 🚫 skip bad links
-            if "craigslist.org" not in link and not link.startswith("/"):
-                continue
-
-            # fix relative links
             if link.startswith("/"):
                 link = "https://lasvegas.craigslist.org" + link
+
+            if "craigslist.org" not in link:
+                continue
 
             listings.append(
                 Listing(
@@ -50,14 +56,12 @@ def search_craigslist(query: str) -> List[Listing]:
                 )
             )
 
-            # limit results
             if len(listings) >= 5:
                 break
 
     except Exception as e:
         print("Craigslist scrape error:", e)
 
-    # fallback if nothing found
     if listings:
         return listings
 
