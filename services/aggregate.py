@@ -4,6 +4,7 @@ from sources.backstage import search_backstage
 from sources.actorsaccess import search_actors_access
 from sources.castingnetworks import search_casting_networks
 from sources.castingfrontier import search_casting_frontier
+from sources.mandy import search_mandy
 from typing import List
 from models import Listing
 from urllib.parse import quote_plus
@@ -53,6 +54,11 @@ def aggregate_results(query: str) -> List[Listing]:
         print("Casting Frontier error:", e)
 
     try:
+        add(search_mandy(query))
+    except Exception as e:
+        print("Mandy error:", e)
+
+    try:
         add(search_craigslist(query))
     except Exception as e:
         print("Craigslist error:", e)
@@ -85,13 +91,6 @@ def aggregate_results(query: str) -> List[Listing]:
             source="Playbill",
             summary="Theater auditions and casting opportunities.",
             url="https://www.playbill.com/jobs"
-        ),
-        Listing(
-            title="Mandy Casting",
-            location="Nationwide",
-            source="Mandy",
-            summary="Film, TV, and commercial casting jobs.",
-            url="https://www.mandy.com/"
         ),
         Listing(
             title="Entertainment Careers",
