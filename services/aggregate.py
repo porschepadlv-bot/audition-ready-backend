@@ -3,6 +3,7 @@ from sources.indeed import search_indeed
 from sources.backstage import search_backstage
 from sources.actorsaccess import search_actors_access
 from sources.castingnetworks import search_casting_networks
+from sources.castingfrontier import search_casting_frontier
 from typing import List
 from models import Listing
 from urllib.parse import quote_plus
@@ -18,7 +19,7 @@ def aggregate_results(query: str) -> List[Listing]:
             if not item.url:
                 continue
 
-            key = item.url.strip().lower()
+            key = item.url.strip().lower().replace("https://www.", "https://")
 
             if key in seen:
                 continue
@@ -45,6 +46,11 @@ def aggregate_results(query: str) -> List[Listing]:
         add(search_casting_networks(query))
     except Exception as e:
         print("Casting Networks error:", e)
+
+    try:
+        add(search_casting_frontier(query))
+    except Exception as e:
+        print("Casting Frontier error:", e)
 
     try:
         add(search_craigslist(query))
@@ -86,13 +92,6 @@ def aggregate_results(query: str) -> List[Listing]:
             source="Mandy",
             summary="Film, TV, and commercial casting jobs.",
             url="https://www.mandy.com/"
-        ),
-        Listing(
-            title="Casting Frontier",
-            location="Nationwide",
-            source="Casting Frontier",
-            summary="Online casting platform for actors and models.",
-            url="https://www.castingfrontier.com/"
         ),
         Listing(
             title="Entertainment Careers",
