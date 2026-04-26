@@ -1,14 +1,17 @@
 from typing import List
 from models import Listing
+from urllib.parse import quote_plus
 
 
 def search_craigslist(query: str) -> List[Listing]:
+    encoded = quote_plus(query)
+
     return [
         Listing(
-            title="Craigslist Talent Gigs",
-            location="Las Vegas",
+            title=f"Craigslist Talent Gigs: {query}",
+            location="Local",
             source="Craigslist",
-            summary="Browse local talent, acting, modeling, and gig listings.",
-            url="https://lasvegas.craigslist.org/search/tlg#search=2~thumb~0"
+            summary="Browse local acting, modeling, and talent gigs. Results vary by city and posting quality.",
+            url=f"https://www.craigslist.org/search/tlg?query={encoded}"
         )
     ]
