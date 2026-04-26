@@ -77,11 +77,11 @@ def aggregate_results(query: str) -> List[Listing]:
             url="https://www.castingcallhub.com/"
         ),
         Listing(
-            title="Local Theater Auditions",
-            location="Local",
-            source="Community Theater",
-            summary="Search local theater companies and community productions for auditions in your city.",
-            url=f"https://www.google.com/search?q={encoded}+community+theater+auditions"
+    title="Local Theater Auditions",
+    location="Las Vegas / Local",
+    source="Community Theater",
+    summary="Browse local theater audition pages, including UNLV Callboard and Las Vegas theater opportunities.",
+    url="https://callboard.sites.unlv.edu/auditions/"
         ),
         Listing(
             title="Film School Casting Calls",
