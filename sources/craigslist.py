@@ -8,7 +8,6 @@ from models import Listing
 
 def search_craigslist(query: str) -> List[Listing]:
     encoded = quote_plus(query)
-
     url = f"https://lasvegas.craigslist.org/search/ggg?query={encoded}"
 
     headers = {
@@ -17,53 +16,58 @@ def search_craigslist(query: str) -> List[Listing]:
 
     try:
         response = requests.get(url, headers=headers, timeout=10)
-        soup = BeautifulSoup(response.text, "html.parser")
 
+        if response.status_code != 200:
+            return []
+
+        soup = BeautifulSoup(response.text, "html.parser")
         results = []
+        seen = set()
 
         posts = soup.find_all("li", class_="cl-static-search-result")
 
-        for post in posts[:5]:  # limit to 5 listings
+        for post in posts:
             title_tag = post.find("a", class_="cl-app-anchor")
             if not title_tag:
                 continue
 
-            title = title_tag.text.strip()
-            link = title_tag["href"]
+            title = title_tag.get_text(strip=True)
+            link = title_tag.get("href", "").strip()
+
+            if not title or not link:
+                continue
+
+            if link in seen:
+                continue
+
+            seen.add(link)
+
+            location = "Las Vegas"
+            location_tag = post.find(class_="location")
+            if location_tag:
+                location = location_tag.get_text(strip=True)
+
+            summary = "Casting / gig opportunity. Tap to view details."
+
+            price_tag = post.find(class_="price")
+            if price_tag:
+                summary = f"{price_tag.get_text(strip=True)} · Tap to view details."
 
             results.append(
                 Listing(
                     title=title,
-                    location="Las Vegas",
+                    location=location,
                     source="Craigslist",
-                    summary="Casting / gig opportunity. Tap to view details.",
+                    summary=summary,
                     url=link
                 )
             )
 
-        # fallback if nothing found
-        if not results:
-            return [
-                Listing(
-                    title=f"Craigslist results: {query}",
-                    location="Las Vegas",
-                    source="Craigslist",
-                    summary="Browse local gigs and casting opportunities.",
-                    url=url
-                )
-            ]
+            if len(results) >= 5:
+                break
 
         return results
 
     except Exception as e:
         print("Craigslist error:", e)
-
-        return [
-            Listing(
-                title=f"Craigslist results: {query}",
-                location="Las Vegas",
-                source="Craigslist",
-                summary="Browse local gigs and casting opportunities.",
-                url=url
-            )
-        ]
+        return []
