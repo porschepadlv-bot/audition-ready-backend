@@ -6,8 +6,50 @@ from bs4 import BeautifulSoup
 from models import Listing
 
 
+def simplify_query(query: str) -> str:
+    clean = query.lower()
+
+    keywords = []
+
+    if "acting" in clean or "actor" in clean:
+        keywords.append("acting")
+
+    if "model" in clean or "modeling" in clean:
+        keywords.append("model")
+
+    if "casting" in clean or "audition" in clean:
+        keywords.append("casting")
+
+    if "film" in clean or "movie" in clean:
+        keywords.append("film")
+
+    if "commercial" in clean:
+        keywords.append("commercial")
+
+    if not keywords:
+        words_to_remove = {
+            "jobs", "job", "in", "near", "me", "las", "vegas",
+            "los", "angeles", "new", "york", "seattle",
+            "casting", "auditions", "audition"
+        }
+
+        words = [
+            word for word in clean.split()
+            if word not in words_to_remove
+        ]
+
+        if words:
+            keywords.append(words[0])
+        else:
+            keywords.append("casting")
+
+    return " ".join(dict.fromkeys(keywords))
+
+
 def search_craigslist(query: str) -> List[Listing]:
-    encoded = quote_plus(query)
+    clean_query = simplify_query(query)
+    encoded = quote_plus(clean_query)
+
     url = f"https://lasvegas.craigslist.org/search/ggg?query={encoded}"
 
     headers = {
