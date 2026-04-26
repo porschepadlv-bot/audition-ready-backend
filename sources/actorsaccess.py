@@ -11,8 +11,6 @@ def search_actors_access(query: str) -> List[Listing]:
         "User-Agent": "Mozilla/5.0"
     }
 
-    results: List[Listing] = []
-
     try:
         response = requests.get(url, headers=headers, timeout=10)
 
@@ -20,31 +18,33 @@ def search_actors_access(query: str) -> List[Listing]:
             return []
 
         soup = BeautifulSoup(response.text, "html.parser")
-
         text = soup.get_text("\n", strip=True)
 
-        # Split into listing blocks
         blocks = text.split("TITLE:")
 
-        for block in blocks[1:6]:  # grab up to 5 listings
+        first_title = ""
+
+        for block in blocks[1:6]:
             lines = [line.strip() for line in block.split("\n") if line.strip()]
 
-            if not lines:
-                continue
+            if lines:
+                first_title = lines[0]
+                break
 
-            title = lines[0]
+        summary = "Browse current casting breakdowns on Actors Access."
 
-            results.append(
-                Listing(
-                    title=title,
-                    location="Nationwide",
-                    source="Actors Access",
-                    summary="Casting breakdown from Actors Access.",
-                    url="https://actorsaccess.com/projects/?view=breakdowns"
-                )
+        if first_title:
+            summary = f"Includes listings like “{first_title}” and more casting breakdowns."
+
+        return [
+            Listing(
+                title="Actors Access",
+                location="Nationwide",
+                source="Actors Access",
+                summary=summary,
+                url="https://actorsaccess.com/projects/?view=breakdowns"
             )
-
-        return results
+        ]
 
     except Exception as e:
         print("Actors Access error:", e)
