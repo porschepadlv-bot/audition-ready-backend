@@ -21,7 +21,7 @@ def aggregate_results(query: str) -> List[Listing]:
             seen_urls.add(item.url)
             results.append((priority, item))
 
-    # Core sources
+    # Core sources (real + useful)
     try:
         add_results(search_backstage(query), priority=1)
     except Exception as e:
@@ -39,7 +39,7 @@ def aggregate_results(query: str) -> List[Listing]:
 
     encoded = quote_plus(query)
 
-    # FIXED sources (no more broken links)
+    # SAFE fallback sources (no broken links)
     extra_sources = [
         (4, Listing(
             title=f"Facebook Groups: {query}",
@@ -49,7 +49,7 @@ def aggregate_results(query: str) -> List[Listing]:
             url=f"https://www.facebook.com/search/groups/?q={encoded}"
         )),
         (5, Listing(
-            title=f"Actors Access: {query}",
+            title=f"Actors Access",
             location="Nationwide",
             source="Actors Access",
             summary="Professional casting breakdowns and auditions.",
@@ -89,6 +89,20 @@ def aggregate_results(query: str) -> List[Listing]:
             source="EntertainmentCareers",
             summary="Entertainment industry jobs and internships.",
             url="https://www.entertainmentcareers.net/"
+        )),
+        (11, Listing(
+            title=f"NYCastings",
+            location="Nationwide",
+            source="NYCastings",
+            summary="Casting calls and acting jobs.",
+            url="https://www.nycastings.com/"
+        )),
+        (12, Listing(
+            title=f"Casting Call Hub",
+            location="Nationwide",
+            source="Casting Call Hub",
+            summary="Browse acting, modeling, and casting opportunities.",
+            url="https://www.castingcallhub.com/"
         ))
     ]
 
