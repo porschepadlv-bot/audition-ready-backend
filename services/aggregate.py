@@ -6,6 +6,7 @@ from sources.castingnetworks import search_casting_networks
 from sources.castingfrontier import search_casting_frontier
 from sources.mandy import search_mandy
 from sources.entertainmentcareers import search_entertainment_careers
+from sources.projectcasting import search_project_casting
 from typing import List
 from models import Listing
 from urllib.parse import quote_plus
@@ -37,6 +38,7 @@ def aggregate_results(query: str) -> List[Listing]:
         ("Casting Frontier", search_casting_frontier),
         ("Mandy", search_mandy),
         ("Entertainment Careers", search_entertainment_careers),
+        ("Project Casting", search_project_casting),
         ("Craigslist", search_craigslist),
     ]:
         try:
