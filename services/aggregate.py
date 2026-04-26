@@ -1,6 +1,7 @@
 from sources.craigslist import search_craigslist
 from sources.indeed import search_indeed
 from sources.backstage import search_backstage
+from sources.actorsaccess import search_actors_access
 from typing import List
 from models import Listing
 from urllib.parse import quote_plus
@@ -35,6 +36,11 @@ def aggregate_results(query: str) -> List[Listing]:
         print("Indeed error:", e)
 
     try:
+        add(search_actors_access(query))
+    except Exception as e:
+        print("Actors Access error:", e)
+
+    try:
         add(search_craigslist(query))
     except Exception as e:
         print("Craigslist error:", e)
@@ -60,13 +66,6 @@ def aggregate_results(query: str) -> List[Listing]:
             source="Facebook",
             summary="Find local casting calls in Facebook groups.",
             url=f"https://www.facebook.com/search/groups/?q={encoded}"
-        ),
-        Listing(
-            title="Actors Access",
-            location="Nationwide",
-            source="Actors Access",
-            summary="Professional casting breakdowns and auditions.",
-            url="https://actorsaccess.com/"
         ),
         Listing(
             title="Playbill Jobs",
