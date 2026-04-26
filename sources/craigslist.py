@@ -3,26 +3,33 @@ from models import Listing
 
 
 def search_craigslist(query: str) -> List[Listing]:
-
-    # Default to major acting cities (no broken URLs)
-    sources = [
-        ("Los Angeles", "https://losangeles.craigslist.org/search/tlg"),
-        ("New York", "https://newyork.craigslist.org/search/tlg"),
-        ("Atlanta", "https://atlanta.craigslist.org/search/tlg"),
-        ("Las Vegas", "https://lasvegas.craigslist.org/search/tlg"),
-    ]
-
-    listings: List[Listing] = []
-
-    for city, url in sources:
-        listings.append(
-            Listing(
-                title=f"Craigslist Talent Gigs ({city})",
-                location=city,
-                source="Craigslist",
-                summary="Browse acting, modeling, and talent gigs.",
-                url=url
-            )
+    return [
+        Listing(
+            title="Craigslist Talent Gigs - Los Angeles",
+            location="Los Angeles",
+            source="Craigslist",
+            summary="Browse local acting, modeling, and talent gigs in Los Angeles.",
+            url="https://losangeles.craigslist.org/search/tlg"
+        ),
+        Listing(
+            title="Craigslist Talent Gigs - New York",
+            location="New York",
+            source="Craigslist",
+            summary="Browse local acting, modeling, and talent gigs in New York.",
+            url="https://newyork.craigslist.org/search/tlg"
+        ),
+        Listing(
+            title="Craigslist Talent Gigs - Atlanta",
+            location="Atlanta",
+            source="Craigslist",
+            summary="Browse local acting, modeling, and talent gigs in Atlanta.",
+            url="https://atlanta.craigslist.org/search/tlg"
+        ),
+        Listing(
+            title="Craigslist Talent Gigs - Las Vegas",
+            location="Las Vegas",
+            source="Craigslist",
+            summary="Browse local acting, modeling, and talent gigs in Las Vegas.",
+            url="https://lasvegas.craigslist.org/search/tlg"
         )
-
-    return listings
+    ]
