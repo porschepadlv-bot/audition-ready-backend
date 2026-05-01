@@ -27,10 +27,10 @@ def root():
     return {"message": "Audition Ready API is live"}
 
 
-@app.post("/search", response_model=dict)
-def search_jobs(request: SearchRequest):
+@app.get("/search", response_model=dict)
+def search_jobs(q: str):
     try:
-        results = aggregate_results(request.prompt)
+        results = aggregate_results(q)
 
         return {
             "results": results
