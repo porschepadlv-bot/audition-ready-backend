@@ -8,42 +8,76 @@ from sources.mandy import search_mandy
 from sources.entertainmentcareers import search_entertainment_careers
 from sources.projectcasting import search_project_casting
 
-from typing import List
-from models import Listing
 from urllib.parse import quote_plus
+from models import Listing
 
 
-def aggregate_results(query: str) -> List[Listing]:
-    results: List[Listing] = []
+MAJOR = "Major Platforms"
+LOCAL = "Local Listings"
+HIDDEN = "Hidden Opportunities"
+
+
+def listing_to_dict(item, category):
+    return {
+        "title": item.title,
+        "location": item.location,
+        "source": item.source,
+        "summary": item.summary,
+        "url": item.url,
+        "category": category
+    }
+
+
+def aggregate_results(query: str):
+    results = []
     seen = set()
     encoded = quote_plus(query)
 
-    def add(items: List[Listing]):
+    def add(items, category):
         for item in items:
             if not item.url:
                 continue
 
             key = item.url.strip().lower().replace("https://www.", "https://")
-
             if key in seen:
                 continue
 
             seen.add(key)
-            results.append(item)
+            results.append(listing_to_dict(item, category))
 
-    for label, fn in [
-        ("Backstage", search_backstage),
+    major_sources = [
         ("Indeed", search_indeed),
         ("Actors Access", search_actors_access),
+        ("Backstage", search_backstage),
         ("Casting Networks", search_casting_networks),
         ("Casting Frontier", search_casting_frontier),
         ("Mandy", search_mandy),
         ("Entertainment Careers", search_entertainment_careers),
+    ]
+
+    hidden_sources = [
         ("Project Casting", search_project_casting),
+    ]
+
+    local_sources = [
         ("Craigslist", search_craigslist),
-    ]:
+    ]
+
+    for label, fn in major_sources:
         try:
-            add(fn(query))
+            add(fn(query), MAJOR)
+        except Exception as e:
+            print(f"{label} error:", e)
+
+    for label, fn in hidden_sources:
+        try:
+            add(fn(query), HIDDEN)
+        except Exception as e:
+            print(f"{label} error:", e)
+
+    for label, fn in local_sources:
+        try:
+            add(fn(query), LOCAL)
         except Exception as e:
             print(f"{label} error:", e)
 
@@ -77,11 +111,11 @@ def aggregate_results(query: str) -> List[Listing]:
             url="https://www.castingcallhub.com/"
         ),
         Listing(
-    title="Local Theater Auditions",
-    location="Las Vegas / Local",
-    source="Community Theater",
-    summary="Browse local theater audition pages, including UNLV Callboard and Las Vegas theater opportunities.",
-    url="https://callboard.sites.unlv.edu/auditions/"
+            title="Local Theater Auditions",
+            location="Las Vegas / Local",
+            source="Community Theater",
+            summary="Browse local theater audition pages, including UNLV Callboard and Las Vegas theater opportunities.",
+            url="https://callboard.sites.unlv.edu/auditions/"
         ),
         Listing(
             title="Film School Casting Calls",
@@ -106,6 +140,8 @@ def aggregate_results(query: str) -> List[Listing]:
         ),
     ]
 
-    add(backup_sources)
+    add(backup_sources[:1], MAJOR)
+    add(backup_sources[1:6], HIDDEN)
+    add(backup_sources[6:], MAJOR)
 
-    return results[:20]
+    return results[:16]
